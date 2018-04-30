@@ -1,0 +1,5 @@
+indent_style = "Visual"
+control_brace_style = "ClosingNextLine"
+brace_style = "AlwaysNextLine"
+format_strings = true
+match_block_trailing_comma = true
