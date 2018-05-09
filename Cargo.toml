@@ -6,9 +6,7 @@ authors = ["Jane Lusby <jlusby42@gmail.com>"]
 [dependencies]
 sysfs_gpio = "0.5"
 chrono = "0.4"
-if_chain = "0.1"
 serenity = "0.5"
 env_logger = "~0.4"
 kankyo = "~0.1"
-log = "~0.3"
 typemap = "0.3"
