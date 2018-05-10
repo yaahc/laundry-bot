@@ -110,23 +110,22 @@ fn send_alert(channel_ids: &Arc<Mutex<Option<Vec<ChannelId>>>>,
               msg: &str)
 {
     let channel_ids = &*channel_ids.lock().unwrap();
-    let snooze_time = (*snooze_time.lock().unwrap()).unwrap();
+    let snooze_time = *snooze_time.lock().unwrap();
 
     println!("Trying to send message to discord");
 
-    let snooze_duration = chrono::Duration::hours(8);
-    if Local::now().signed_duration_since(snooze_time) < snooze_duration {
-        println!("Not sending message, currently in snooze mode");
-        return;
+    if let Some(snooze_time) = snooze_time {
+        let snooze_duration = chrono::Duration::hours(8);
+        if Local::now().signed_duration_since(snooze_time) < snooze_duration {
+            println!("Not sending message, currently in snooze mode");
+            return;
+        }
     }
 
-    match channel_ids {
-        Some(channel_ids) => {
-            for channel in channel_ids {
-                let _ = channel.say(&msg);
-            }
-        },
-        _ => {},
+    if let Some(channel_ids) = channel_ids {
+        for channel in channel_ids {
+            let _ = channel.say(&msg);
+        }
     }
 }
 
@@ -162,10 +161,10 @@ fn step(data: &mut State, event: &Event)
                     (*data).state = Appliance::WaitingForUnload;
 
                     let formated_time = format!("{}", (*data).start.unwrap().format("%-l:%M %P"));
-                    let msg = format!("@everyone Your laundry is done! It started at {} and ran for {:?} minutes.",
+                    let msg = format!("@everyone Your laundry is done! It started at {} and ran \
+                                       for {} minutes.",
                                       formated_time,
-                                      (*data).stop
-                                      .map(|t| t.signed_duration_since((*data).start.unwrap()).num_minutes()));
+                                      stop.signed_duration_since(start).num_minutes());
 
                     send_alert(&data.channel_ids, &data.snooze_time, &msg);
                     (*data).last_msg = Some(current_time);
@@ -248,7 +247,7 @@ fn main()
                 Some(snooze) => {
                     let mut snooze_time = snooze.lock().unwrap();
                     msg.channel_id
-                        .say("@everyone okay okay, ill stop bothering you... for now")?;
+                        .say("okay okay, ill stop bothering you... for now")?;
                     *snooze_time = Some(Local::now());
                 }
                 None => {
@@ -263,7 +262,7 @@ fn main()
                 Some(snooze) => {
                     let mut snooze_time = snooze.lock().unwrap();
                     msg.channel_id
-                        .say("@everyone Aye Aye Boss")?;
+                        .say("Aye Aye Boss")?;
                     *snooze_time = None;
                 }
                 None => {
