@@ -1,4 +1,4 @@
-pub mod alerter;
+pub mod discord;
 
 extern crate chrono;
 
@@ -37,4 +37,10 @@ pub fn finally_unloaded() -> Option<String>
                        watch continues...");
 
     return Some(msg);
+}
+
+pub trait Alerter
+{
+    fn send(&self, msg: &Option<String>);
+    fn reset(&mut self);
 }

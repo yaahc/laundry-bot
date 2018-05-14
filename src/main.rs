@@ -7,7 +7,8 @@ extern crate chrono;
 extern crate kankyo;
 extern crate typemap;
 
-use laundry::alert::alerter::discord::DiscordAlerter;
+use laundry::alert::discord::DiscordAlerter;
+use laundry::Laundry;
 use std::env;
 
 fn main()
@@ -19,9 +20,9 @@ fn main()
                                                           .parse()
                                                           .expect("pin not a valid int");
 
-    let alerter = DiscordAlerter::new();
+    let mut alerter = DiscordAlerter::new();
 
-    let mut state = laundry::State::new(&alerter);
+    let mut laundry = Laundry::new(&mut alerter);
 
-    state.laundry_thread(pin);
+    laundry.laundry_thread(pin);
 }

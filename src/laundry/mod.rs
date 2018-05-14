@@ -3,9 +3,9 @@ pub mod alert;
 extern crate chrono;
 extern crate sysfs_gpio;
 
-use self::alert::alerter::Alerter;
 use self::sysfs_gpio::{Direction, Edge, Pin};
 use chrono::prelude::*;
+use laundry::alert::Alerter;
 
 #[derive(Debug, Clone)]
 enum Appliance
@@ -23,25 +23,24 @@ pub enum Event
     PollerError,
 }
 
-// todo split up all state stuff
-pub struct State<'a>
+pub struct Laundry<'a>
 {
     state: Appliance,
     start: Option<DateTime<Local>>,
     stop: Option<DateTime<Local>>,
     last_msg: Option<DateTime<Local>>,
-    alerter: &'a Alerter,
+    alerter: &'a mut Alerter,
 }
 
-impl<'a> State<'a>
+impl<'a> Laundry<'a>
 {
-    pub fn new(alerter: &Alerter) -> State
+    pub fn new(alerter: &mut Alerter) -> Laundry
     {
-        State { state: Appliance::Off,
-                start: None,
-                stop: None,
-                last_msg: None,
-                alerter: alerter, }
+        Laundry { state: Appliance::Off,
+                  start: None,
+                  stop: None,
+                  last_msg: None,
+                  alerter: alerter, }
     }
 
     pub fn laundry_thread(&mut self, pin: u64)
@@ -144,9 +143,7 @@ impl<'a> State<'a>
         self.start = None;
         self.stop = None;
         {
-            // TODO reset snooze time
-            // let mut snooze_time = self.snooze_time.lock().unwrap();
-            // *snooze_time = None; // reset snooze on unload
+            self.alerter.reset();
         }
     }
 }

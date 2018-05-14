@@ -1,7 +1,7 @@
 extern crate chrono;
 
 use chrono::prelude::*;
-use laundry::alert::alerter::Alerter;
+use laundry::alert::Alerter;
 use serenity::framework::StandardFramework;
 use serenity::model::gateway::Ready;
 use serenity::model::id::ChannelId;
@@ -118,6 +118,11 @@ impl Alerter for DiscordAlerter
                 }
             }
         }
+    }
+
+    fn reset(&mut self)
+    {
+        *self.snooze_time.lock().unwrap() = None;
     }
 }
 
